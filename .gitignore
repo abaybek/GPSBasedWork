@@ -1,0 +1,6 @@
+all.csv
+./data/*
+./data_preprocessed/*
+./data_preprocessed2/*
+total.csv
+total2.csv
