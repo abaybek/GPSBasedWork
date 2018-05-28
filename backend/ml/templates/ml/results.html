@@ -2,7 +2,23 @@
 {% load staticfiles %}
 {% block upload %}
     <h1>Id is {{ pk }}</h1>
-    
+    <div class="ui link cards">
+        <div class="card">
+            <div class="image">
+            <img src="/media/driver.jpg">
+            </div>
+            <div class="content">
+            <div class="header">{{ name }}</div>
+            <div class="meta">
+                <a>{{ email }}</a>
+            </div>
+            <div class="description">
+                Some description
+            </div>
+            </div>
+
+        </div>
+    </div>
 {% endblock %}
 
 {% block table %}
