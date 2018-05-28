@@ -20,9 +20,13 @@
         </div>
         <div class="four wide column"></div>
         <div class="four wide column">
-                
+            {% block table %}
+            {% endblock %}
         </div>
-        <div class="four wide column"></div>
+        <div class="four wide column">
+            {% block linkers %}
+            {% endblock %}
+        </div>
     </div>
 
 {% block scripts %}

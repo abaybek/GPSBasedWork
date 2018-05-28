@@ -1,5 +1,6 @@
 import os
 from django.db import models
+from django.core.files import File
 from .utils import load_trajectory_df
 import gmplot
 
@@ -16,10 +17,17 @@ X_columns = ['distance', 'velocity', 'acceleration',
              'a_rol', 'a_rsd', 'a_qu1', 'a_qu2', 'a_qu3']
 
 colors_map = {
-    '0.0': 'red',
+    '0.0': 'royalblue',
     '1.0': 'green',
-    '2.0': 'yellow',
-    '3.0': 'black'
+    '2.0': 'coral',
+    '3.0': 'blueviolet'
+}
+
+encode_map = {
+    '0.0': 'bike',
+    '1.0': 'train',
+    '2.0': 'vehicle',
+    '3.0': 'walk'
 }
 
 # Create your models here.
@@ -29,12 +37,17 @@ class GpsData(models.Model):
     email = models.EmailField(max_length=70)
     data = models.FileField(upload_to='data/')
     uploaded_at = models.DateTimeField(auto_now_add=True)
+    mapfile = models.FileField(upload_to='maps/', null=True, blank=True)
 
     def __str__(self):
         return f"Author: {self.name} - email: {self.email}"
     
     def filename(self):
         return os.path.basename(self.data.name)
+    
+    @property
+    def get_pandas(self):
+        return load_trajectory_df(self.data.path)
     
     def get_map(self):
         def predict(df):
@@ -71,16 +84,16 @@ class GpsData(models.Model):
             gmap.draw("my_map.html")
             with open('my_map.html', 'r') as myfile:
                 data=myfile.read()
+                self.mapfile.save(self.name, File(myfile))
             return data
 
-        def preprocess(datapath):
-            df = load_trajectory_df(datapath)
+        def preprocess():
+            df = self.get_pandas
             df = predict(df)
 
             array = get_lat_lon(df)
             html = write_map(array)
             return html
 
-        path = self.data.path
-        html = preprocess(path)
+        html = preprocess()
         return html

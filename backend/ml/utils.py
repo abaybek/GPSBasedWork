@@ -82,8 +82,8 @@ def load_trajectory_df(full_filename):
     df = df.dropna()
     df = df.reset_index(drop=True)
     # output only 15nth row
-    every_nth_row = 15
-    df = df[df.index % every_nth_row == 0]
+    # every_nth_row = 15
+    # df = df[df.index % every_nth_row == 0]
     return df
 
 #This method calculates the aggregated feature and 
