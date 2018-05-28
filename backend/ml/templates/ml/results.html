@@ -1,0 +1,17 @@
+{% extends 'ml/base.html' %}
+{% load staticfiles %}
+{% block upload %}
+
+<!-- <canvas id="map_canvas">
+    <h1>Id is {{ pk }}</h1>
+    <input type="hidden" id="pk" value="{{ pk }}">
+</canvas> -->
+{% autoescape off %}
+    {{ map }}
+{% endautoescape %}
+{% endblock %}
+
+
+{% block scripts %}
+    <!-- <script src="{% static 'ml/js/core.js' %}" type="text/javascript"></script> -->
+{% endblock %}

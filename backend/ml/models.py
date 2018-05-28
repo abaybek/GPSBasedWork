@@ -3,6 +3,15 @@ from django.db import models
 from .utils import load_trajectory_df
 import gmplot
 
+# ML model
+from catboost import CatBoostClassifier
+from sklearn import preprocessing
+from django.conf import settings
+import numpy as np
+model = CatBoostClassifier().load_model(settings.MODEL_FILE)
+encoder = preprocessing.LabelEncoder()
+encoder.classes_ = np.load(settings.MODEL_HEADER)
+
 # Create your models here.
 
 class GpsData(models.Model):

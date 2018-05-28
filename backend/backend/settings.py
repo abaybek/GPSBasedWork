@@ -126,3 +126,6 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'static')
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
+
+MODEL_FILE = os.path.join(BASE_DIR, 'ml/mlmodels/catboost/2.mlmodel')
+MODEL_HEADER = os.path.join(BASE_DIR, 'ml/mlmodels/catboost/2-headers.mlmodel.npy')
