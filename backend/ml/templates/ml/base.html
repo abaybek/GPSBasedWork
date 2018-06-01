@@ -8,27 +8,42 @@
 
     <link rel="stylesheet" href="{% static 'ml/css/semantic.min.css' %}" type = "text/css"/>
     <link rel="stylesheet" href="{% static 'ml/css/style.css' %}" type = "text/css"/>
+    <script src="{% static 'ml/js/jquery-3.3.1.js' %}" type="text/javascript"></script>
     <script async src="{% static 'ml/js/semantic.min.js' %}" type="text/javascript"></script>
-    <script async src="{% static 'ml/js/jquery-3.3.1.js' %}" type="text/javascript"></script>
+
+    <script src="{% static 'ml/js/Chart.bundle.js' %}" type="text/javascript"></script>
     
     <title>Document</title>
 </head>
 <body>
-    <div class="container"> 
+<div class="container"> 
     <div class="ui grid">
-        <div class="four wide column">
-            {% block upload %}
-            {% endblock %}
-        </div>
-        <div class="four wide column"></div>
-        <div class="four wide column">
-            {% block table %}
-            {% endblock %}
-        </div>
-        <div class="four wide column">
-            {% block linkers %}
-            {% endblock %}
-        </div>
+            <div class="four wide column">
+                {% block upload %}
+                {% endblock %}
+            </div>
+            <div class="twelve wide column">
+                <div class="row">
+                    <div class="container">
+                        {% block table %}
+                        {% endblock %}
+                    </div>
+                    <div class="container">
+                        {% block charts %}
+                        {% endblock %}
+                    </div>
+                </div>
+                <div class="row">
+                    {% block linkers %}
+                    {% endblock %}
+                </div>
+            </div>
+            <!-- <div class="four wide column">
+                
+            </div>
+            <div class="four wide column">
+                
+            </div> -->
     </div>
 </div>
 {% block scripts %}
