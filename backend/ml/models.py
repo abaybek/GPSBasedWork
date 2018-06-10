@@ -90,10 +90,18 @@ class GpsData(models.Model):
         def preprocess():
             df = self.get_pandas
             df = predict(df)
+            grouped = df.groupby(['ans'])['distance'].sum()
+            grouped=grouped.to_json()
+
+            print(df.head())
+            print(df.columns)
+            print(df['velocity'])
+            print(df['velocity'].max(), df['velocity'].min())
+            # print(df.velocity)
 
             array = get_lat_lon(df)
             html = write_map(array)
-            return html
+            return html, grouped
 
-        html = preprocess()
-        return html
+        html, grouped = preprocess()
+        return html, grouped

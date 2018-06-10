@@ -23,10 +23,12 @@
 {% endblock %}
 
 {% block table %}
-<table class="ui celled table">
+<table class="ui celled table" id="table-results">
     <thead>
         <tr><th>Color</th>
-        <th>Transport</th></tr>
+        <th>Transport</th>
+        <th>Distance</th></tr>
+        
     </thead>
     <tbody>
         <tr>
@@ -47,13 +49,33 @@
         </tr>
     </tbody>
 </table>
+<script type='text/javascript'>
+    var geodata = {{ map|safe }};
+    var tabl = $('#table-results');
+    var counter = 0;
+
+    tabl.find('tr').each(function(){
+        var trow = $(this);
+        if(counter !== 0){
+            var res = 0;
+            if (geodata[(counter-1)+'.0']){
+                res = geodata[(counter-1)+'.0'];
+            }
+            trow.append('<td>' +res + '</td>');
+        }
+        counter+=1;
+    });
+</script>
+<!-- {{ map }} -->
 {% endblock %}
 
 {% block charts %}
 
 <canvas id="myChart"></canvas>
 <canvas id="myChart2"></canvas>
+
 <script>
+
 document.getElementById("myChart").height = 50;
 document.getElementById("myChart2").height = 50;
 document.getElementById("myChart3").height = 100;
