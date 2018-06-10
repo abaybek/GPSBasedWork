@@ -97,11 +97,11 @@ class GpsData(models.Model):
             print(df.columns)
             print(df['velocity'])
             print(df['velocity'].max(), df['velocity'].min())
-            # print(df.velocity)
-
+            vel, acc = df['velocity'].to_json(),  df['acceleration'].to_json()
+            
             array = get_lat_lon(df)
             html = write_map(array)
-            return html, grouped
+            return html, grouped, vel, acc
 
-        html, grouped = preprocess()
-        return html, grouped
+        html, grouped, vel, acc = preprocess()
+        return html, grouped, vel, acc

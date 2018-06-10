@@ -66,7 +66,7 @@
         counter+=1;
     });
 </script>
-<!-- {{ map }} -->
+
 {% endblock %}
 
 {% block charts %}
@@ -76,6 +76,11 @@
 
 <script>
 
+    var vel = {{ velocity|safe }}
+    var acc = {{ acceleration|safe }}
+    console.log(vel);
+    console.log(acc);
+
 document.getElementById("myChart").height = 50;
 document.getElementById("myChart2").height = 50;
 document.getElementById("myChart3").height = 100;
@@ -83,43 +88,36 @@ var ctx = document.getElementById("myChart").getContext('2d');
 var ctx2 = document.getElementById("myChart2").getContext('2d');
 var ctx3 = document.getElementById("myChart3").getContext('2d');
 
+var array = $.map(vel, function(value, index) {
+    return parseFloat(value);
+});
+
+console.log(array);
+console.log([1,2,3,4])
 var options = {
-    type: 'bar',
-    responsive: true,
-    maintainAspectRatio: false,
-    data: {
-        labels: ["Red", "Blue", "Yellow", "Green", "Purple", "Orange"],
-        datasets: [{
-            label: '# of Votes',
-            data: [12, 19, 3, 5, 2, 3],
-            backgroundColor: [
-                'rgba(255, 99, 132, 0.2)',
-                'rgba(54, 162, 235, 0.2)',
-                'rgba(255, 206, 86, 0.2)',
-                'rgba(75, 192, 192, 0.2)',
-                'rgba(153, 102, 255, 0.2)',
-                'rgba(255, 159, 64, 0.2)'
-            ],
-            borderColor: [
-                'rgba(255,99,132,1)',
-                'rgba(54, 162, 235, 1)',
-                'rgba(255, 206, 86, 1)',
-                'rgba(75, 192, 192, 1)',
-                'rgba(153, 102, 255, 1)',
-                'rgba(255, 159, 64, 1)'
-            ],
-            borderWidth: 1
-        }]
-    },
+    type: 'line',
     options: {
         scales: {
-            yAxes: [{
+            yAxis: [{
+                display: true,
                 ticks: {
-                    beginAtZero:true
+                    beginAtZero: true,
+                    max: 1
                 }
             }]
         }
-    }
+    },
+    // responsive: true,
+    // maintainAspectRatio: false,
+    data: {
+        label:[ 'noe'],
+        datasets: [
+            {
+                data: [0.2246016565, 0.567536445, 0.939642601, 0.6238692899, 0.6738050631, 0.4867559205, 1.0816192811]
+            }
+        ]
+    },
+    // optio`
 }
 
 var myChart = new Chart(ctx, options);

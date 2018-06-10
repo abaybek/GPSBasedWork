@@ -18,8 +18,13 @@ def model_form_upload(request):
         form = GpsDataForm(request.POST, request.FILES)
         if form.is_valid():
             m = form.save()
-            print(m.get_map()[1])
-            return render(request, 'ml/results.html', {'pk': m.pk, 'map': m.get_map()[1], 'name': m.name, 'email': m.email})
+            return render(request, 'ml/results.html', {'pk': m.pk, 
+                                                      'map': m.get_map()[1], 
+                                                     'name': m.name, 
+                                                    'email': m.email,
+                                                    'velocity': m.get_map()[2],
+                                                    'acceleration': m.get_map()[3]
+                                                    })
     else:
         form = GpsDataForm()
     return render(request, 'ml/model_form_upload.html', {
@@ -30,5 +35,5 @@ def model_form_upload(request):
 def results(request, pk):
     obj = GpsData.objects.get(pk=pk)
     if request.method == 'GET':
-        html = obj.get_map()
+        html = obj.get_map()[0]
         return HttpResponse(html)

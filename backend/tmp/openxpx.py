@@ -6,7 +6,7 @@ from datetime import datetime
 
 parse_dates = ['time']
 
-d = pd.read_csv('data/20180531.csv', parse_dates=parse_dates)
+d = pd.read_csv('dataset/20180605.csv', parse_dates=parse_dates)
 
 
 d['Longitude'] = d['lon']
@@ -46,7 +46,7 @@ Reserved 3
 
 print(heading)
 
-with open('exportNew.plt', 'a') as out:
+with open('dataset/20180605.plt', 'a') as out:
     out.write(heading)
 
     for i, row in d.iterrows():
