@@ -13,13 +13,28 @@
                 <a>{{ email }}</a>
             </div>
             <div class="description">
-                Some description
+                Driver № {{pk}}
             </div>
             </div>
         </div>
     </div>
-    <canvas id="myChart3"></canvas>
-
+    <br />
+    <button onclick="location.href = '/ml/result/{{pk}}';" id="myButton" class="ui button" >Map</button>
+    <br />
+    <table class="ui celled table" id="table-rasp">
+            <thead>
+                <tr><th>Start</th>
+                <th>End</th>
+                <th>Mode</th></tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td></td>
+                    <td></td>
+                    <td></td>
+                </tr>
+            </tbody>
+        </table>
 {% endblock %}
 
 {% block table %}
@@ -28,7 +43,6 @@
         <tr><th>Color</th>
         <th>Transport</th>
         <th>Distance</th></tr>
-        
     </thead>
     <tbody>
         <tr>
@@ -69,65 +83,278 @@
 
 {% endblock %}
 
+
 {% block charts %}
+<style> /* set the CSS */
 
-<canvas id="myChart"></canvas>
-<canvas id="myChart2"></canvas>
-
+    body { font: 12px Arial;}
+    
+    path { 
+        stroke: steelblue;
+        stroke-width: 2;
+        fill: none;
+    }
+    .axis path,
+    .axis line {
+        fill: none;
+        stroke: grey;
+        stroke-width: 1;
+        shape-rendering: crispEdges;
+    }
+    .line {
+        fill: none;
+        stroke: url(#line-gradient);
+        stroke-width: 2px;
+    }
+</style>
+<div id="charts"></div>
 <script>
+var total = {{ total|safe }}
+console.log(total);
+// Set the dimensions of the canvas / graph
+// var margin = {top: 30, right: 20, bottom: 30, left: 50},
+//     width = 600 - margin.left - margin.right,
+//     height = 270 - margin.top - margin.bottom;
+// set the dimensions and margins of the graph
+var margin = {top: 20, right: 20, bottom: 50, left: 70},
+    width = 700 - margin.left - margin.right,
+    height = 270 - margin.top - margin.bottom;
 
-    var vel = {{ velocity|safe }}
-    var acc = {{ acceleration|safe }}
-    console.log(vel);
-    console.log(acc);
+// Parse the date / time
+var parseDate = d3.time.format("%d-%b-%y").parse;
 
-document.getElementById("myChart").height = 50;
-document.getElementById("myChart2").height = 50;
-document.getElementById("myChart3").height = 100;
-var ctx = document.getElementById("myChart").getContext('2d');
-var ctx2 = document.getElementById("myChart2").getContext('2d');
-var ctx3 = document.getElementById("myChart3").getContext('2d');
+// Set the ranges
+var x = d3.time.scale().domain([d3.min(total, function(d) { return d.datetime; }), 
+                                d3.max(total, function(d) { return d.datetime; })])
+                       .range([0, width]);
+var y = d3.scale.linear().range([height, 0]);
+var z = d3.scale.linear().range([height, 0]);
 
-var array = $.map(vel, function(value, index) {
-    return parseFloat(value);
-});
+// Define the axes
+var xAxis = d3.svg.axis().scale(x)
+    .orient("bottom").ticks(5);
 
-console.log(array);
-console.log([1,2,3,4])
-var options = {
-    type: 'line',
-    options: {
-        scales: {
-            yAxis: [{
-                display: true,
-                ticks: {
-                    beginAtZero: true,
-                    max: 1
-                }
-            }]
+var yAxis = d3.svg.axis().scale(y)
+    .orient("left").ticks(5);
+
+var zAxis = d3.svg.axis().scale(z)
+    .orient("left").ticks(5);
+
+// Define the line
+var valueline = d3.svg.line()
+    .x(function(d) { return x(d.x); })
+    .y(function(d) { return y(d.y); });
+
+// Define the line
+var accelerationline = d3.svg.line()
+    .x(function(d) { return x(d.x); })
+    .y(function(d) { return z(d.z); });
+    
+// Adds the svg canvas
+var svg = d3.select("#charts")
+    .append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+        .attr("transform", 
+              "translate(" + margin.left + "," + margin.top + ")");
+
+var svg2 = d3.select("#charts")
+    .append("svg")
+        .attr("width", width + margin.left + margin.right)
+        .attr("height", height + margin.top + margin.bottom)
+    .append("g")
+        .attr("transform", 
+              "translate(" + margin.left + "," + margin.top + ")");
+
+    var colors_map = {
+        "0": "royalblue",
+        "1": "green",
+        "2": "coral",
+        "3": "blueviolet"
+    }
+
+    var velArray = [];
+    var colorInd = -1;
+    var obj = {}
+    total.forEach(function(d){
+        d.datetime = new Date(d.datetime);
+        d.color = colors_map[d.ans];
+        
+        if(colorInd === -1){
+            colorInd = d.color;
+            obj['start'] = d.datetime
+            obj['c'] = colorInd;
+            obj['p'] = []
+            obj['p'].push({x: d.datetime, y: d.velocity, z: d.acceleration});
         }
-    },
-    // responsive: true,
-    // maintainAspectRatio: false,
-    data: {
-        label:[ 'noe'],
-        datasets: [
-            {
-                data: [0.2246016565, 0.567536445, 0.939642601, 0.6238692899, 0.6738050631, 0.4867559205, 1.0816192811]
+        if(d.color != colorInd){
+            // Check if it small
+            if(obj['p'].length > 0){
+                obj['end'] = d.datetime
+                velArray.push(obj);
+                obj = {}
+                obj['start'] = d.datetime
+                colorInd = d.color;
+                obj['c'] = colorInd;
+                obj['p'] = []
+                obj['p'].push({x: d.datetime, y: d.velocity, z: d.acceleration});
             }
-        ]
-    },
-    // optio`
-}
 
-var myChart = new Chart(ctx, options);
-var myChart = new Chart(ctx2, options);
-var myChart = new Chart(ctx3, options);
+        }else if(d.color == colorInd){
+            obj['p'].push({x: d.datetime, y: d.velocity, z: d.acceleration});
+        }
+    });
+
+    //
+    var velArray2 = [];
+    var colorInd = -1;
+    var obj = {}
+    total.forEach(function(d){
+        d.datetime = new Date(d.datetime);
+        d.color = colors_map[d.ans];
+        
+        if(colorInd === -1){
+            colorInd = d.color;
+            obj['start'] = d.datetime
+            obj['c'] = colorInd;
+            obj['p'] = []
+            obj['p'].push({x: d.datetime, y: d.velocity, z: d.acceleration});
+        }
+        if(d.color != colorInd){
+            // Check if it small
+            if(obj['p'].length > 10){
+                obj['end'] = d.datetime
+                velArray2.push(obj);
+                obj = {}
+                obj['start'] = d.datetime
+                colorInd = d.color;
+                obj['c'] = colorInd;
+                obj['p'] = []
+                obj['p'].push({x: d.datetime, y: d.velocity, z: d.acceleration});
+            }
+
+        }else if(d.color == colorInd){
+            obj['p'].push({x: d.datetime, y: d.velocity, z: d.acceleration});
+        }
+    });
+    //
+    console.log(velArray);
+    
+    var mode_map = {
+        "royalblue": "Bike",
+        "green": "Train",
+        "coral": "Vehicle",
+        "blueviolet": "Walk"
+    }
+    var tableRef = document.getElementById('table-rasp').getElementsByTagName('tbody')[0];
+
+    function formatDateTo(x){
+        return x.getHours() + ':' + x.getMinutes();
+    }
+    console.log(velArray2);
+    velArray2.forEach(function(d){
+
+        if (d['p'].length > 5){
+        var newRow   = tableRef.insertRow(tableRef.rows.length);
+        var newCell  = newRow.insertCell(0);
+        // Append a text node to the cell
+        var newText  = document.createTextNode(formatDateTo(d.start));
+        newCell.appendChild(newText);
+
+        var newCell  = newRow.insertCell(1);
+        // Append a text node to the cell
+        var newText  = document.createTextNode(formatDateTo(d.end));
+        newCell.appendChild(newText);
+        
+        var newCell  = newRow.insertCell(2);
+        // Append a text node to the cell
+        var newText  = document.createTextNode(mode_map[d.c]);
+        newCell.appendChild(newText);
+    }
+        
+    })
+    // Scale the range of the data
+    x.domain(d3.extent(total, function(d) { return d.datetime; }));
+    y.domain([d3.min(total, function(d) { return d.velocity; }), d3.max(total, function(d) { return d.velocity; })]);
+    z.domain([d3.min(total, function(d) { return d.acceleration; }), d3.max(total, function(d) { return d.acceleration; })]);
+    
+    // Loop through each symbol / key
+    velArray.forEach(function(d) {
+        svg.append("path")
+            .attr("class", "line")
+            .style("stroke", function() { // Add dynamically
+                return d.c; 
+            })
+            .attr("d", valueline(d.p));
+
+        svg2.append("path")
+            .attr("class", "line")
+            .style("stroke", function() { // Add dynamically
+                return d.c; 
+            })
+            .attr("d", accelerationline(d.p));
+    });
+
+    // Add the X Axis
+    svg.append("g")
+        .attr("class", "x axis")
+        .attr("transform", "translate(0," + height + ")")
+        .call(xAxis);
+
+    // Add the Y Axis
+    svg.append("g")
+        .attr("class", "y axis")
+        .call(yAxis);
+  // text label for the x axis
+  svg.append("text")             
+      .attr("transform",
+            "translate(" + (width/2) + " ," + 
+                           (height + margin.top + 20) + ")")
+      .style("text-anchor", "middle")
+      .text("Date");
+
+  // text label for the y axis
+  svg.append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 0 - margin.left)
+      .attr("x",0 - (height / 2))
+      .attr("dy", "1em")
+      .style("text-anchor", "middle")
+      .text("Velocity");   
+
+// ---------------------------------------------------------------------
+   // Add the X Axis
+   svg2.append("g")
+        .attr("class", "x axis")
+        .attr("transform", "translate(0," + height + ")")
+        .call(xAxis);
+
+    // Add the Y Axis
+    svg2.append("g")
+        .attr("class", "y axis")
+        .call(zAxis);
+  // text label for the x axis
+  svg2.append("text")             
+      .attr("transform",
+            "translate(" + (width/2) + " ," + 
+                           (height + margin.top + 20) + ")")
+      .style("text-anchor", "middle")
+      .text("Date");
+
+  // text label for the y axis
+  svg2.append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 0 - margin.left)
+      .attr("x",0 - (height / 2))
+      .attr("dy", "1em")
+      .style("text-anchor", "middle")
+      .text("Acceleration");   
+
 </script>
 {% endblock %}
 
 {% block linkers %}
-    <button onclick="location.href = '/ml/result/{{pk}}';" id="myButton" class="ui button" >Map</button>
 {% endblock %}
 
 {% block scripts %}

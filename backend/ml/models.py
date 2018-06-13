@@ -93,15 +93,12 @@ class GpsData(models.Model):
             grouped = df.groupby(['ans'])['distance'].sum()
             grouped=grouped.to_json()
 
-            print(df.head())
-            print(df.columns)
-            print(df['velocity'])
-            print(df['velocity'].max(), df['velocity'].min())
+            total = df[['datetime','timedelta','velocity', 'acceleration', 'ans']].to_json(orient = "records")
             vel, acc = df['velocity'].to_json(),  df['acceleration'].to_json()
             
             array = get_lat_lon(df)
             html = write_map(array)
-            return html, grouped, vel, acc
+            return html, grouped, vel, acc, total
 
-        html, grouped, vel, acc = preprocess()
-        return html, grouped, vel, acc
+        html, grouped, vel, acc, total = preprocess()
+        return html, grouped, vel, acc, total
